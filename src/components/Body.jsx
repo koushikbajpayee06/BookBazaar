@@ -6,6 +6,7 @@ import { useEffect } from "react";
 const Body = () => {
   const [books, setBooks] = useState(bookList)
   const [searchText, setSearchText] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all")
 
   const handleChange = (e)=>{
     setSearchText(e.target.value)
@@ -17,12 +18,26 @@ const Body = () => {
         books.author.toLowerCase().includes(searchText.toLowerCase())
       )
     })
-    setBooks(filterBooks)
+    setBooks(filterBooks) 
   }
   const handleReset = () => {
     setSearchText("");
     setBooks(bookList);
   };
+
+  const handleCategoryChange = (e)=>{
+    const category = e.target.value
+    setSelectedCategory(category)
+
+    if(category === "all"){
+      setBooks(bookList)
+    }else{
+      const filteredBooks = bookList.filter((book)=>{
+        return book.category === category
+      })
+      setBooks(filteredBooks)
+    }
+  }
   useEffect(() => {
     setBooks(bookList)
   }, [])
@@ -46,6 +61,24 @@ const Body = () => {
       >
         Search
       </button>
+        <button
+        type="button"
+        onClick={handleReset}
+        className="rounded-lg border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 transition hover:bg-gray-100"
+      >
+        Show All
+      </button>
+      <select 
+       value={selectedCategory}
+       onChange={ handleCategoryChange}
+       className="rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none focus:border-orange-500">
+        <option value="all">All Categories</option>
+        <option value="Programming">Programming</option>
+        <option value="Finance">Finance</option>
+        <option value="Self Help">Self Help</option>
+        <option value="Productivity">Productivity</option>
+        <option value="Fiction">Fiction</option>
+      </select>
     </div>
 
      {books.length === 0 ? (
