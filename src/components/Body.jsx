@@ -1,6 +1,7 @@
 import { useState } from "react";
 import bookList from "../data/bookList";
 import BookCard from "./BookCard";
+import { Link } from "react-router-dom";
 
 const Body = () => {
   const [books, setBooks] = useState(bookList);
@@ -142,10 +143,12 @@ const Body = () => {
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {books.map((book) => (
-            <BookCard
-              key={book.id}
-              bookData={book}
-            />
+            <Link to={`/books/${book.id}`}>
+              <BookCard
+                key={book.id}
+                bookData={book}
+              />
+            </Link>
           ))}
         </div>
       )}
