@@ -1,52 +1,99 @@
 import { useState } from "react";
 import bookList from "../data/bookList";
 import BookCard from "./BookCard";
-import { useEffect } from "react";
 
 const Body = () => {
-  const [books, setBooks] = useState(bookList)
+  const [books, setBooks] = useState(bookList);
   const [searchText, setSearchText] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all")
+  const [selectedCategory, setSelectedCategory] =
+    useState("all");
+  const [isTopRated, setIsTopRated] =
+    useState(false);
 
-  const handleChange = (e)=>{
-    setSearchText(e.target.value)
-  }
-  const handleClick = ()=>{
-    const filterBooks = bookList.filter((books)=>{
-      return(
-        books.title.toLowerCase().includes(searchText.toLowerCase()) ||
-        books.author.toLowerCase().includes(searchText.toLowerCase())
-      )
-    })
-    setBooks(filterBooks) 
-  }
+  const applyFilters = (
+    query,
+    category,
+    topRated
+  ) => {
+    const normalizedQuery = query
+      .trim()
+      .toLowerCase();
+
+    const filteredBooks = bookList.filter((book) => {
+      const searchMatch =
+        book.title
+          .toLowerCase()
+          .includes(normalizedQuery) ||
+        book.author
+          .toLowerCase()
+          .includes(normalizedQuery);
+
+      const categoryMatch =
+        category === "all" ||
+        book.category === category;
+
+      const ratingMatch =
+        !topRated || book.rating >= 4.7;
+
+      return (
+        searchMatch &&
+        categoryMatch &&
+        ratingMatch
+      );
+    });
+
+    setBooks(filteredBooks);
+  };
+
+  const handleChange = (e) => {
+    setSearchText(e.target.value);
+  };
+
+  const handleSearch = () => {
+    applyFilters(
+      searchText,
+      selectedCategory,
+      isTopRated
+    );
+  };
+
+  const handleCategoryChange = (e) => {
+    const category = e.target.value;
+
+    setSelectedCategory(category);
+
+    applyFilters(
+      searchText,
+      category,
+      isTopRated
+    );
+  };
+
+  const handleTopRatedBooks = () => {
+    const nextTopRatedValue = !isTopRated;
+
+    setIsTopRated(nextTopRatedValue);
+
+    applyFilters(
+      searchText,
+      selectedCategory,
+      nextTopRatedValue
+    );
+  };
+
   const handleReset = () => {
     setSearchText("");
+    setSelectedCategory("all");
+    setIsTopRated(false);
     setBooks(bookList);
   };
 
-  const handleCategoryChange = (e)=>{
-    const category = e.target.value
-    setSelectedCategory(category)
-
-    if(category === "all"){
-      setBooks(bookList)
-    }else{
-      const filteredBooks = bookList.filter((book)=>{
-        return book.category === category
-      })
-      setBooks(filteredBooks)
-    }
-  }
-  useEffect(() => {
-    setBooks(bookList)
-  }, [])
   return (
     <main className="mx-auto max-w-7xl px-6 py-10">
       <h1 className="mb-8 text-3xl font-bold text-gray-900">
         Explore Our Books
       </h1>
-    <div className="mb-8 flex w-full max-w-2xl gap-3">
+    <div className="mb-8 flex w-full flex-wrap gap-3">
       <input onChange={handleChange}
         value={searchText}
         type="text"
@@ -56,7 +103,7 @@ const Body = () => {
 
       <button
         type="button"
-        onClick={handleClick}
+        onClick={handleSearch}
         className="rounded-lg bg-orange-600 px-6 py-3 font-semibold text-white transition hover:bg-orange-700"
       >
         Search
@@ -79,6 +126,13 @@ const Body = () => {
         <option value="Productivity">Productivity</option>
         <option value="Fiction">Fiction</option>
       </select>
+      <button
+        type="button"
+        onClick={handleTopRatedBooks}
+        className="rounded-lg bg-green-600 px-5 py-3 font-semibold text-white transition hover:bg-green-700"
+      >
+        {isTopRated ? "Show All Ratings" : "Top Books"}
+      </button>
     </div>
 
      {books.length === 0 ? (
@@ -98,5 +152,7 @@ const Body = () => {
     </main>
   );
 };
+  
+
 
 export default Body;
