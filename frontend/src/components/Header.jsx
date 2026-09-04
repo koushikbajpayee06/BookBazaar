@@ -1,5 +1,14 @@
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 const Header = () => {
+  const cartItems = useSelector(
+    (store) => store.cart.items
+  );
+
+const cartCount = cartItems.reduce(
+  (total, book) => total + book.quantity,
+  0
+);
   return (
     <header  className=" bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
@@ -9,7 +18,7 @@ const Header = () => {
             <li className="text-gray-700 hover:text-orange-600 cursor-pointer"><Link to="/">Home</Link></li>
             <li className="text-gray-700 hover:text-orange-600 cursor-pointer"><Link to="/books">Books</Link></li>
             <li className="text-gray-700 hover:text-orange-600 cursor-pointer"><Link to="/about">About</Link></li>
-            <li className="text-gray-700 hover:text-orange-600 cursor-pointer"><Link to="/cart">Cart (0)</Link></li>
+            <li className="text-gray-700 hover:text-orange-600 cursor-pointer"><Link to="/cart">Cart ({cartCount})</Link></li>
           </ul>
         </nav>
       </div>

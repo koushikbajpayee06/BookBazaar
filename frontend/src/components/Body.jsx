@@ -6,10 +6,8 @@ import { Link } from "react-router-dom";
 const Body = () => {
   const [books, setBooks] = useState(bookList);
   const [searchText, setSearchText] = useState("");
-  const [selectedCategory, setSelectedCategory] =
-    useState("all");
-  const [isTopRated, setIsTopRated] =
-    useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [isTopRated, setIsTopRated] = useState(false);
 
   const applyFilters = (
     query,
