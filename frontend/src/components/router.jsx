@@ -5,11 +5,13 @@ import About from "./About";
 import Cart from "./Cart";
 import BookDetails from "./BookDetails";
 import Home from "./Home";
+import ErrorPage from "./ErrorPage";
 
 const appRouter = createBrowserRouter([
   {
     path: "/",
     element: <AppLayout />,
+    errorElement: <ErrorPage />,
     children: [
       {
         index: true,

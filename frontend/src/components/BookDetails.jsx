@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import bookList from "../data/bookList";
 import { useDispatch } from "react-redux";
 import { addItem } from "../utils/cartSlice";
@@ -20,9 +20,30 @@ const BookDetails = () => {
   // console.log("Book ID:", bookId);
   // console.log("Matching book:", book);
 
-  if (!book) {
-    return <h1>Book not found</h1>;
-  }
+if (!book) {
+  return (
+    <main className="flex min-h-[70vh] items-center justify-center px-6">
+      <div className="max-w-lg rounded-2xl bg-white p-10 text-center shadow-lg">
+        <p className="text-6xl">📚</p>
+
+        <h1 className="mt-5 text-3xl font-bold text-gray-900">
+          Book Not Found
+        </h1>
+
+        <p className="mt-3 text-gray-600">
+          The requested book does not exist or may have been removed.
+        </p>
+
+        <Link
+          to="/books"
+          className="mt-7 inline-block rounded-lg bg-orange-600 px-6 py-3 font-semibold text-white transition hover:bg-orange-700"
+        >
+          Browse Books
+        </Link>
+      </div>
+    </main>
+  );
+}
 
   const {
     title,
