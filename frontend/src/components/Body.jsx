@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import bookList from "../data/bookList";
 import BookCard from "./BookCard";
 import { Link } from "react-router-dom";
+import Shimmer from "./Shimmer";
 
 const Body = () => {
   const [books, setBooks] = useState(bookList);
   const [searchText, setSearchText] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isTopRated, setIsTopRated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const applyFilters = (
     query,
@@ -87,7 +89,18 @@ const Body = () => {
     setBooks(bookList);
   };
 
+  useEffect(() => {
+  const timer = setTimeout(() => {
+    setIsLoading(false);
+  }, 1200);
+
+  return () => clearTimeout(timer);
+}, []);
+  if (isLoading) {
+    return <Shimmer />;
+  }
   return (
+    
     <main className="mx-auto max-w-7xl px-6 py-10">
       <h1 className="mb-8 text-3xl font-bold text-gray-900">
         Explore Our Books
