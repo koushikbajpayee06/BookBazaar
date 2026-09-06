@@ -27,6 +27,12 @@ The application is being developed as a hands-on learning project focused on fro
 - Clear the complete cart
 - Header cart count
 - Per-item subtotal and total cart price
+- Cart persistence across page refreshes with `localStorage`
+- Route-level 404 error page with `useRouteError`
+- Dedicated invalid-book state for unknown book IDs
+- Reusable shimmer loading interface
+- Responsive mobile navigation with an accessible menu toggle
+- Add-to-cart and quantity-updated toast feedback
 
 ### Backend — Foundation Completed
 
@@ -104,9 +110,11 @@ book-bazaar/
 │   │   │   ├── BookCard.jsx
 │   │   │   ├── BookDetails.jsx
 │   │   │   ├── Cart.jsx
+│   │   │   ├── ErrorPage.jsx
 │   │   │   ├── Footer.jsx
 │   │   │   ├── Header.jsx
 │   │   │   ├── Home.jsx
+│   │   │   ├── Shimmer.jsx
 │   │   │   └── router.jsx
 │   │   ├── data/
 │   │   │   └── bookList.js
@@ -226,6 +234,31 @@ const totalPrice = cartItems.reduce(
 );
 ```
 
+## Cart Persistence
+
+Redux state normally resets when the page reloads. BookBazaar saves cart items in `localStorage` whenever the store changes and restores them through the store's `preloadedState`.
+
+```text
+Redux cart update
+   ↓
+store.subscribe()
+   ↓
+JSON.stringify()
+   ↓
+localStorage
+   ↓
+Page reload
+   ↓
+JSON.parse() and preloadedState
+```
+
+## Loading and Error States
+
+- The book catalogue uses a reusable Tailwind shimmer component while loading.
+- Unknown application routes render a route-level error page.
+- Valid book routes with an unknown ID render a dedicated Book Not Found state.
+- Cart actions provide short success messages for new items and quantity updates.
+
 ## Backend Data Models
 
 ### User
@@ -328,6 +361,11 @@ This project currently demonstrates:
 - Global state management with Redux Toolkit
 - Action dispatching and state selection
 - Quantity-based cart logic and derived totals
+- Redux store subscription and `localStorage` persistence
+- Loading skeletons and conditional rendering
+- Route-level and resource-level error handling
+- Responsive navigation with accessible menu controls
+- State-driven toast feedback
 - FastAPI project organization
 - SQLAlchemy models and relationships
 - Pydantic request and response schemas
@@ -339,14 +377,13 @@ This project currently demonstrates:
 
 ### Frontend
 
-- Persist cart state with `localStorage`
-- Add route-level error UI and shimmer loading
 - Add reusable custom hooks
 - Add Context API theme management
 - Replace `bookList.js` with backend API data
+- Replace simulated loading with real API request state
 - Add authentication screens
 - Add checkout and order-history pages
-- Improve mobile navigation and accessibility
+- Complete final responsive and accessibility testing
 
 ### Backend
 
