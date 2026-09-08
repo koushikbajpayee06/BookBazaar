@@ -3,7 +3,17 @@ const BookCard = ({bookData}) => {
     const {title, author, category, price, rating, image, description} = bookData;
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden hover:-translate-y-1 hover:shadow-xl transition">
-        <img className="w-full h-72 object-cover" src={image} alt={title} />
+        {image ? (
+          <img
+            className="w-full h-72 object-cover"
+            src={image}
+            alt={title}
+          />
+        ) : (
+          <div className="flex h-72 items-center justify-center bg-gray-100 text-gray-500">
+            No cover available
+          </div>
+        )}
        <div  className="p-5">
             <h3 className="text-xl font-bold text-gray-900">{title}</h3>
             <p  className="mt-1 text-sm text-gray-600">{author}</p>
