@@ -41,3 +41,29 @@ export async function fetchBooks({
     image: book.image_url,
   }));
 }
+
+export async function fetchBookById(bookId, { signal } = {}) {
+  const response = await fetch(
+    `${BOOKS_API_URL}${encodeURIComponent(bookId)}`,
+    { signal }
+  );
+
+  if (!response.ok) {
+    const error = new Error(
+      response.status === 404
+        ? "Book not found"
+        : `Could not load book (${response.status})`
+    );
+
+    error.status = response.status;
+    throw error;
+  }
+
+  const book = await response.json();
+
+  return {
+    ...book,
+    author: book.author_name,
+    image: book.image_url,
+  };
+}
