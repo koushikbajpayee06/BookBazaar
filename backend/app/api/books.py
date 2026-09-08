@@ -14,11 +14,12 @@ router = APIRouter(prefix="/api/books", tags=["Books"])
     "/",
     response_model=list[BookOut]
 )
-def get_all_books(db:Session = Depends(get_db),
+def get_all_books(db:Session = Depends(get_db),category: str | None = None
 ):
-    books = db.query(Book).all()
-    return books
-
+    query = db.query(Book)
+    if category :
+        query = query.filter(Book.category == category)
+    return query.all()
 @router.get(
     "/{book_id}",
     response_model=BookOut
