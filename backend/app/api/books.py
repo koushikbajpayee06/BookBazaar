@@ -20,6 +20,8 @@ def get_all_books(db:Session = Depends(get_db),
                   category: str | None = None,
                   search: str | None = None,
                   min_rating: float | None = Query(default=None, ge=0, le=5),
+                  limit: int = Query(default=10, ge=1, le=100),
+                  offset: int = Query(default=0, ge=0),
 ):
     query = db.query(Book)
     if category :
@@ -33,7 +35,11 @@ def get_all_books(db:Session = Depends(get_db),
         )
     if min_rating is not None:
         query = query.filter(Book.rating >= min_rating)
-    return query.all()
+    return (query
+    .order_by(Book.id)
+    .offset(offset)
+    .limit(limit)
+    .all())
 @router.get(
     "/{book_id}",
     response_model=BookOut
