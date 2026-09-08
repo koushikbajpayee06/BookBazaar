@@ -7,6 +7,8 @@ from app.schemas.book import BookCreate
 from app.models.user import User
 from app.core.dependencies import require_roles
 from app.schemas.book import BookUpdate
+from sqlalchemy import or_
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 router = APIRouter(prefix="/api/books", tags=["Books"])
 
@@ -14,11 +16,23 @@ router = APIRouter(prefix="/api/books", tags=["Books"])
     "/",
     response_model=list[BookOut]
 )
-def get_all_books(db:Session = Depends(get_db),category: str | None = None
+def get_all_books(db:Session = Depends(get_db),
+                  category: str | None = None,
+                  search: str | None = None,
+                  min_rating: float | None = Query(default=None, ge=0, le=5),
 ):
     query = db.query(Book)
     if category :
         query = query.filter(Book.category == category)
+    if search:
+        query = query.filter(
+            or_(
+                Book.title.ilike(f"%{search}%"),
+                Book.author_name.ilike(f"%{search}%"),
+            )
+        )
+    if min_rating is not None:
+        query = query.filter(Book.rating >= min_rating)
     return query.all()
 @router.get(
     "/{book_id}",
