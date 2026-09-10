@@ -87,6 +87,15 @@ const Header = () => {
                 Cart ({cartCount})
               </Link>
             </li>
+            <li>
+            <Link
+              to="/login"
+              onClick={closeMenu}
+              className="block rounded-lg bg-orange-600 px-5 py-2 text-center font-semibold text-white transition hover:bg-orange-700"
+            >
+              Login
+            </Link>
+          </li>
           </ul>
         </nav>
       </div>

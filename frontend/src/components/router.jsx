@@ -6,6 +6,8 @@ import Cart from "./Cart";
 import BookDetails from "./BookDetails";
 import Home from "./Home";
 import ErrorPage from "./ErrorPage";
+import Login from "./Login";
+import Register from "./Register";
 
 const appRouter = createBrowserRouter([
   {
@@ -32,6 +34,14 @@ const appRouter = createBrowserRouter([
       {
         path: "cart",
         element: <Cart />,
+      },
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        path: "register",
+        element: <Register />,
       },
     ],
   },
