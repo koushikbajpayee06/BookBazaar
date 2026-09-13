@@ -12,7 +12,7 @@ class BookBase(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
 
 class BookCreate(BookBase):
-    pass
+    rating: float = Field(default=0, ge=0, le=5)
 
 class BookUpdate(BaseModel):
     title: str | None = Field(default=None, min_length=1)

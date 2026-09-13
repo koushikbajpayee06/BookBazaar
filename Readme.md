@@ -1,230 +1,121 @@
 # BookBazaar
 
-BookBazaar is an online bookstore project built with React, Vite, Tailwind CSS, and FastAPI. It combines a responsive book catalogue and Redux-powered cart with a SQLite-backed API for authentication, book management, and role-based access control.
+BookBazaar is a full-stack online bookstore built with React, Vite, Tailwind CSS, and FastAPI. It combines an API-backed book catalogue with JWT authentication, role-based book management, and a browser-persisted Redux cart.
 
-**Current status:** The frontend uses local `bookList.js` data and browser-local cart persistence. The backend supports JWT authentication and Book CRUD with role and ownership checks. Frontend–backend integration, server-side search/filtering, and database-backed cart/order workflows are still planned.
+## Current Status
+
+Book listing and details now load from the FastAPI backend. Search, category and minimum-rating filters, pagination, and request loading/error states are integrated into the React catalogue.
+
+Backend authentication and book permissions are implemented. Frontend login/register screens, author/admin management screens, database-backed carts, and orders are still planned. The existing cart uses Redux and `localStorage`.
 
 ## Features
 
 ### Frontend
 
-- Responsive Home, Books, Book Details, About, Cart, Header, and Footer UI
-- Reusable `BookCard` and shimmer components
-- Search by title or author, category filtering, and a top-rated toggle
-- Combined filters, reset controls, and empty-search states
-- React Router navigation and dynamic `/books/:bookId` details
-- Responsive two-column book details layout
-- Redux Toolkit cart: add items, merge repeated items into quantities, increase/decrease quantity, remove items, and clear cart
-- Header cart count, per-item subtotals, and total cart price
-- Cart persistence across refreshes using `localStorage`
-- Route-level error page with `useRouteError` and a separate unknown-book state
-- Responsive mobile navigation with an accessible menu toggle
-- Add-to-cart and quantity-update toast feedback
+- Responsive Home, Books, Book Details, About, Cart, Header, and Footer
+- API-backed catalogue and dynamic `/books/:bookId` details
+- Combined title/author search, category filtering, and Top Books toggle
+- Previous/Next pagination, filter reset, and empty states
+- Real request loading with Shimmer and listing retry after errors
+- Separate request-error, unknown-book, and route-error states
+- Cover placeholder when a book has no image
+- Redux cart with add, quantity changes, remove, clear, header count, and totals
+- Cart persistence through `localStorage` and add-to-cart feedback
 
 ### Backend
 
-- FastAPI application with modular API routers
-- SQLite database, SQLAlchemy models, and dependency-injected sessions
-- User–Book relationship through `created_by_id`
-- Pydantic v2 user, token, and book schemas
-- Registration with bcrypt password hashing and duplicate-email checks
-- Login with signed JWT access tokens and configurable expiry
-- Bearer-token verification and protected current-user endpoint
-- Reusable `require_roles()` dependency
-- Admin-only dashboard test endpoint
-- Public book listing and book details endpoints
-- Author/admin book creation, with ownership assigned from the authenticated user
-- Partial book updates with `exclude_unset=True`
-- Ownership checks for book updates and deletion
-- Explicit null rejection during PATCH, except for `image_url`
-- Book deletion with `204 No Content` and missing-book responses with `404`
+- Modular FastAPI routers and SQLAlchemy sessions
+- SQLite User and Book models with relationships
+- Pydantic v2 request/response schemas
+- Registration, duplicate-email checks, bcrypt password hashing, and JWT login
+- Protected current-user endpoint and reusable role dependency
+- Public book listing/details and author/admin book creation
+- Partial updates and deletion with author ownership checks
+- Search, category and rating filters, and offset/limit pagination
+- Nonnegative price/stock and nonempty, whitespace-trimmed text validation
+- CORS for the local React frontend
 
 ## Tech Stack
 
 | Layer | Technologies |
 | --- | --- |
 | Frontend | React, JavaScript, React Router, Redux Toolkit, React Redux |
-| Styling and tooling | Tailwind CSS, Vite, npm |
+| Styling/tooling | Tailwind CSS, Vite, npm |
 | Backend | Python, FastAPI, Uvicorn |
 | Database | SQLite, SQLAlchemy ORM |
-| Validation and configuration | Pydantic v2, pydantic-settings, email-validator |
+| Validation/configuration | Pydantic v2, pydantic-settings, email-validator |
 | Authentication | python-jose, Passlib, bcrypt |
-| Python dependency management | uv, pyproject.toml, uv.lock |
-| Planned deployment additions | PostgreSQL, Docker, cloud hosting |
+| Python dependencies | uv, pyproject.toml, uv.lock |
 
-## Architecture and Integration Status
+## Repository and Documentation
 
-The project uses one modular FastAPI backend. Frontend and backend live in separate folders within the same repository.
+The frontend and one modular backend live in the same repository; this is not a microservices deployment.
 
-| Component | Current data source / responsibility |
+| Path | Responsibility |
 | --- | --- |
-| React catalogue and details | Local `bookList.js` dataset |
-| React cart | Redux state, persisted in browser `localStorage` |
-| FastAPI authentication | SQLAlchemy User model in SQLite |
-| FastAPI Book CRUD | SQLAlchemy Book model in SQLite |
-| React-to-FastAPI connection | Planned; requires CORS, API calls, and field mapping |
+| `frontend/src/api/books.js` | Book API requests and field mapping |
+| `frontend/src/components/` | Pages and reusable UI |
+| `frontend/src/utils/` | Redux store and cart slice |
+| `frontend/src/data/bookList.js` | Legacy local dataset; no longer used by listing/details |
+| `backend/app/api/` | Auth, admin, and book routes |
+| `backend/app/core/` | Settings, security, and dependencies |
+| `backend/app/models/` | SQLAlchemy User and Book models |
+| `backend/app/schemas/` | Pydantic schemas |
+| `backend/app/database.py` | Database engine and session dependency |
 
-Frontend search and filters currently operate on local data. They are not yet backed by API query parameters. Browser cart persistence is not an authenticated server-side cart.
+See [Frontend README](frontend/README.md) and [Backend README](backend/README.md) for implementation details.
 
-## Project Structure
+## Data and Integration
 
-```text
-book-bazaar/
-  frontend/
-    public/
-    src/
-      components/
-        About.jsx
-        Body.jsx
-        BookCard.jsx
-        BookDetails.jsx
-        Cart.jsx
-        ErrorPage.jsx
-        Footer.jsx
-        Header.jsx
-        Home.jsx
-        Shimmer.jsx
-        router.jsx
-      data/
-        bookList.js
-      utils/
-        appStore.js
-        cartSlice.js
-      App.jsx
-      index.css
-      main.jsx
-    package.json
-    vite.config.js
-  backend/
-    app/
-      api/
-        auth.py
-        admin.py
-        books.py
-      core/
-        config.py
-        dependencies.py
-        security.py
-      models/
-        user.py
-        book.py
-      schemas/
-        user.py
-        auth.py
-        book.py
-      database.py
-      main.py
-    .gitignore
-    .python-version
-    pyproject.toml
-    uv.lock
-    README.md
-  README.md
-```
+| Feature | Current source |
+| --- | --- |
+| Catalogue and book details | FastAPI and SQLite |
+| Search, filters, pagination | Backend query parameters |
+| Cart | Redux and browser localStorage |
+| Authentication | Backend API; frontend integration pending |
 
-The backend `.env`, `.venv`, and SQLite database are local runtime files. Package `__init__.py` files are omitted from this overview.
+The frontend API helper maps `author_name` to `author` and `image_url` to `image`. Links use database IDs. Local sample books are not automatically imported into SQLite. Other pages using the legacy dataset require a separate review.
 
-## Frontend Routes
+The backend defaults to 10 results per request; the frontend requests 12. The list response is an array without a total count. If the last page contains exactly 12 books, Next can lead to an empty page; Previous remains available.
 
-| Route | Component | Purpose |
+## Routes and Access
+
+Frontend routes: `/`, `/books`, `/books/:bookId`, `/about`, and `/cart`.
+
+| Method | API endpoint | Access |
 | --- | --- | --- |
-| `/` | `Home` | Bookstore landing page |
-| `/books` | `Body` | Searchable and filterable catalogue |
-| `/books/:bookId` | `BookDetails` | Selected book details |
-| `/about` | `About` | Project information |
-| `/cart` | `Cart` | Items, quantities, subtotals, and total |
+| GET | `/` | Public health check |
+| POST | `/api/auth/register` | Public; creates customer |
+| POST | `/api/auth/login` | Public; returns access token |
+| GET | `/api/auth/me` | Authenticated |
+| GET | `/api/admin/dashboard` | Admin |
+| GET | `/api/books/` | Public; filtered/paginated listing |
+| GET | `/api/books/{book_id}` | Public |
+| POST | `/api/books/` | Author or admin |
+| PATCH | `/api/books/{book_id}` | Author owning the book, or admin |
+| DELETE | `/api/books/{book_id}` | Author owning the book, or admin |
 
-## Backend Endpoints
+Public registration does not accept a role. Role assignment currently uses local database administration. User/order administration APIs are not implemented.
 
-| Method | Endpoint | Access | Behaviour |
-| --- | --- | --- | --- |
-| GET | `/` | Public | API health message |
-| POST | `/api/auth/register` | Public | Create a customer account; `201` |
-| POST | `/api/auth/login` | Public | Verify credentials and return a bearer token |
-| GET | `/api/auth/me` | Authenticated | Return safe current-user fields |
-| GET | `/api/admin/dashboard` | Admin | Demonstrate admin-only access |
-| GET | `/api/books/` | Public | Return all books |
-| GET | `/api/books/{book_id}` | Public | Return one book or `404` |
-| POST | `/api/books/` | Author / Admin | Create a book; `201` |
-| PATCH | `/api/books/{book_id}` | Owner Author / Admin | Update supplied fields |
-| DELETE | `/api/books/{book_id}` | Owner Author / Admin | Delete a book; `204`, no response body |
-
-Missing, invalid, or expired credentials return `401` on protected routes. A disallowed role or ownership mismatch returns `403`. Duplicate registration emails return `400`.
-
-## Roles and Ownership
-
-| Action | Customer | Author | Admin |
-| --- | --- | --- | --- |
-| Browse books | Yes | Yes | Yes |
-| Create books | No | Yes | Yes |
-| Update/delete own books | No | Yes | Yes |
-| Update/delete another user's books | No | No | Yes |
-| Access admin dashboard endpoint | No | No | Yes |
-
-Public registration always defaults to `customer`; it does not accept a role. Role changes currently use local database administration, not a public role-change endpoint.
-
-`author_name` is the book's writer. `created_by_id` identifies the platform user who added the listing. There is no separate Author database entity. `User.books` and `Book.created_by` provide the two sides of the relationship.
-
-Cart/order permissions and user/order administration remain planned.
-
-## Data Models and Schemas
-
-| Model | Fields |
-| --- | --- |
-| User | `id`, `name`, `email`, `hashed_password`, `role`, `created_at` |
-| Book | `id`, `title`, `author_name`, `description`, `category`, `price`, `rating`, `image_url`, `stock`, `created_by_id`, `created_at` |
-
-User schemas separate registration, login, and output data. `UserOut` excludes passwords and password hashes. `BookCreate` accepts editable book fields; IDs, ownership, and timestamps are assigned by the backend. Rating currently defaults to `0` and is not accepted by create/update schemas.
-
-`BookUpdate` supports partial updates. Only fields explicitly included in a request are applied. Required book fields cannot be explicitly set to `null`; `image_url` can be cleared with `null`.
-
-The current price column uses `Float`. Currency representation and stronger numeric constraints will be reviewed before checkout is implemented. Timestamps are generated in UTC; SQLite does not preserve timezone offsets merely because `DateTime(timezone=True)` is configured.
-
-## Frontend State and Data Flow
-
-The catalogue applies search, category, and rating conditions together to `bookList`. Cards receive book data through props and link to the selected book's details page.
-
-Cart actions dispatch to `cartSlice`, which adds a new item or updates quantities. Header and Cart components select the resulting state. Supported actions include `addItem`, `increaseQuantity`, `decreaseQuantity`, `removeItem`, and `clearCart`.
-
-Total price is derived from item price multiplied by quantity. A store subscription saves cart items to `localStorage`; the application restores them through `preloadedState` after refresh.
-
-The shimmer currently represents frontend loading behaviour. Real network loading and error handling will be added during integration. Field mapping will also be needed, including local `author` versus API `author_name` and frontend route IDs versus integer database IDs.
+`author_name` names the writer; `created_by_id` identifies the platform user who added the listing. There is no separate Author model.
 
 ## Getting Started
 
-### Prerequisites
-
-- Node.js and npm for the frontend
-- Python and uv for the backend (developed with Python 3.12)
-- Git
-
-### Clone the repository
+Prerequisites: Git, Node.js/npm, and Python/uv. Backend development uses Python 3.12.
 
 ```bash
 git clone https://github.com/koushikbajpayee06/BookBazaar.git
 cd BookBazaar
 ```
 
-### Run the frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Open the local URL printed by Vite, usually `http://localhost:5173`.
-
-### Configure and run the backend
-
-Open a second terminal at the repository root:
+### Backend
 
 ```bash
 cd backend
 uv sync
 ```
 
-Create `backend/.env` with these values:
+Create `backend/.env`:
 
 ```env
 SECRET_KEY=replace_with_a_generated_random_secret
@@ -232,139 +123,65 @@ ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 ```
 
-Generate a secret locally and place the output in `SECRET_KEY`:
+Generate a secret locally:
 
 ```bash
 uv run python -c "import secrets; print(secrets.token_urlsafe(32))"
 ```
 
-Start the server from the **backend directory**:
+Run from the backend directory:
 
 ```bash
 uv run uvicorn app.main:app --reload
 ```
 
-- API: `http://127.0.0.1:8000`
-- Swagger: `http://127.0.0.1:8000/docs`
-
-The SQLite URL is `sqlite:///./bookbazaar.db`, so its location depends on the working directory. Running from `backend/` also lets configuration find `.env` correctly.
-
-`Base.metadata.create_all()` creates missing tables after model imports. It does not migrate existing table definitions. Database migrations are a future improvement; deleting the database is not a migration strategy.
-
-## Manual API Walkthrough
-
-1. Register with name, email, and password using `/api/auth/register`.
-2. Login with the same credentials using `/api/auth/login`.
-3. Copy `access_token`, open Swagger's **Authorize**, and paste only the token. HTTPBearer adds the `Bearer` prefix.
-4. Call `/api/auth/me` to verify authentication.
-5. Use an account assigned `author` or `admin` through local database administration to create a book.
-
-Example create body:
-
-```json
-{
-  "title": "Atomic Habits",
-  "author_name": "James Clear",
-  "category": "Self-help",
-  "description": "A book about building better habits.",
-  "price": 499,
-  "image_url": null,
-  "stock": 10
-}
-```
-
-Use the returned ID to retrieve the book. To test PATCH, send only the desired changes:
-
-```json
-{
-  "price": 449,
-  "stock": 15
-}
-```
-
-For deletion testing, create a disposable book. Successful deletion returns `204`; retrieving its ID afterwards should return `404`.
-
-## Validation Status
-
-Manual development checks have confirmed registration, login, the current-user endpoint, customer rejection from the admin endpoint, admin access, book creation/retrieval, PATCH, and deletion followed by `404`.
-
-The complete author ownership matrix (own book allowed, another author's book denied), invalid-input cases, and automated regression tests remain to be completed. Implemented checks are not presented as a fully tested production security system.
-
-## Local Files and Dependencies
-
-Keep local environments, secrets, databases, and caches out of version control:
-
-```gitignore
-node_modules/
-dist/
-.env
-.venv/
-*.db
-__pycache__/
-*.py[cod]
-```
-
-Ignore rules do not untrack files already committed. Check staged files before committing. Keep `uv.lock` committed for reproducible dependency installation.
-
-The development setup pinned bcrypt to `4.3.0` to work around a Passlib/bcrypt compatibility failure. Version-metadata warnings and incomplete-package warnings have been observed; dependency/environment cleanup remains outstanding. Stop the server before changing packages on Windows to avoid locked `.pyd` files.
-
-## Learning Outcomes
-
-- Reusable React components, props, destructuring, and stable keys
-- Controlled inputs and combined filtering
-- Dynamic routing, loading states, and resource-level errors
-- Redux actions, selectors, quantity-based cart logic, and derived totals
-- Browser persistence with store subscriptions and `localStorage`
-- Modular FastAPI routers and dependency injection
-- SQLAlchemy models, foreign keys, and bidirectional relationships
-- Pydantic v2 request/response schemas and ORM serialization
-- Password hashing, JWT authentication, and bearer-token handling
-- Role-based authorization and object ownership checks
-- Partial updates, explicit null handling, and HTTP status codes
-
-## Roadmap
-
-### Backend and Integration
-
-- [x] Database and User/Book models
-- [x] Registration, login, JWT, and current-user endpoint
-- [x] Role dependency and admin-only endpoint
-- [x] Public book listing and details
-- [x] Author/admin book creation
-- [x] Book PATCH and DELETE with ownership checks
-- [ ] Complete author ownership and invalid-input tests
-- [ ] Search by title/author, category and minimum-rating filters
-- [ ] Pagination
-- [ ] Stronger validation for prices, stock, and text fields
-- [ ] Currency representation suitable for checkout
-- [ ] CORS configuration and React API integration
-- [ ] Database-backed user carts
-- [ ] Order placement, stock validation, and transaction handling
-- [ ] Own-order history and admin order management
-- [ ] Database migrations and PostgreSQL transition
+API: http://127.0.0.1:8000 — Swagger: http://127.0.0.1:8000/docs
 
 ### Frontend
 
-- [ ] Replace local book data with backend API responses
-- [ ] Add real request loading/error states and reusable custom hooks
-- [ ] Authentication screens and authenticated API requests
-- [ ] Author/admin book management forms
-- [ ] Checkout and order-history pages
-- [ ] Context API theme management
-- [ ] Final responsive and accessibility verification
+In a second terminal, from the repository root:
 
-### Quality, Deployment, and Future AI
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-- [ ] Resolve dependency/environment warnings
-- [ ] Backend API and frontend unit/integration tests
-- [ ] Docker support and deployment configuration
-- [ ] Deploy frontend, backend, and database
-- [ ] Explore AI-powered book discovery after the core bookstore is complete
+Open http://localhost:5173/books. The current API base URL is configured directly in `frontend/src/api/books.js`. CORS allows `http://localhost:5173`; if the frontend origin changes, update backend CORS accordingly.
 
-Future AI work may reuse techniques learned in DocuMind AI for semantic discovery over book metadata and descriptions. DocuMind AI remains a separate project.
+A new database has no books. Register/login in Swagger, use a locally assigned author/admin account, and create books through the API to populate the catalogue.
+
+## Verification and Limitations
+
+Manual development checks cover authentication, admin access checks, book CRUD, filters, pagination, text/numeric validation, and frontend listing/details flows. Automated regression tests and the complete author ownership test matrix remain pending.
+
+- Ratings default to `0`; book create/update schemas do not accept a rating. Top Books filters at `4.7`, so newly created books will not appear there.
+- Price currently uses `Float`; checkout requires a review of currency representation.
+- SQLite uses `sqlite:///./bookbazaar.db`; run from `backend/` to use the intended database.
+- `create_all()` creates missing tables but does not migrate existing tables.
+- Dependency/environment warnings involving Passlib/bcrypt were observed during development; cleanup remains pending.
+- Ignore secrets, environments, databases, caches, and generated dependencies. Ignore rules do not remove previously tracked files or repository history.
+
+## Roadmap
+
+- [x] User/Book models and schemas
+- [x] Registration, JWT login, current user, roles, and book ownership checks
+- [x] Book CRUD, combined filters, pagination, and book input validation
+- [x] CORS and React listing/details integration
+- [x] Real loading/error states and missing-cover fallback
+- [x] Local Redux cart and persistence
+- [ ] Frontend register/login, logout, and session handling
+- [ ] Author/admin book-management forms
+- [ ] Database-backed cart and frontend synchronization
+- [ ] Checkout, orders, stock validation, and transaction handling
+- [ ] Order history and admin order management
+- [ ] Currency representation and database migrations
+- [ ] Dependency cleanup and automated tests
+- [ ] Responsive/accessibility verification and deployment
+- [ ] Explore AI book discovery after the core bookstore is complete
+
+DocuMind AI remains a separate project; its techniques may inform future semantic book discovery.
 
 ## Author
 
-**Koushik Bajpayee**
-
-Full-Stack Developer exploring React, Node.js, FastAPI, Generative AI, RAG, and AI Agents.
+**Koushik Bajpayee** — Full-Stack Developer exploring React, Node.js, FastAPI, Generative AI, RAG, and AI Agents.
