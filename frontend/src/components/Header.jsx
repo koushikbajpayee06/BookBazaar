@@ -1,8 +1,19 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { clearCredentials } from "../utils/authSlice";
 
 const Header = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const user = useSelector((store) => store.auth.user);
+
+  const handleLogout = () => {
+    dispatch(clearCredentials());
+    closeMenu();
+    navigate("/login", { replace: true });
+  };
   const [isMenuOpen, setIsMenuOpen] =
     useState(false);
 
@@ -87,15 +98,33 @@ const Header = () => {
                 Cart ({cartCount})
               </Link>
             </li>
-            <li>
-            <Link
-              to="/login"
-              onClick={closeMenu}
-              className="block rounded-lg bg-orange-600 px-5 py-2 text-center font-semibold text-white transition hover:bg-orange-700"
-            >
-              Login
-            </Link>
-          </li>
+            {user ? (
+              <>
+                <li className="py-3 text-gray-700 md:py-0">
+                  Hi, {user.name}
+                </li>
+
+                <li>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="rounded-lg bg-orange-600 px-5 py-2 font-semibold text-white transition hover:bg-orange-700"
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
+            ) : (
+              <li>
+                <Link
+                  to="/login"
+                  onClick={closeMenu}
+                  className="block rounded-lg bg-orange-600 px-5 py-2 text-center font-semibold text-white transition hover:bg-orange-700"
+                >
+                  Login
+                </Link>
+              </li>
+            )}
           </ul>
         </nav>
       </div>

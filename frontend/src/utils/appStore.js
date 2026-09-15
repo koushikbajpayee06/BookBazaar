@@ -1,11 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import cartReducer from "./cartSlice";
-
+import authReducer from "./authSlice";
 const savedCartItems =
   JSON.parse(localStorage.getItem("cartItems")) || [];
 const appStore = configureStore({
     reducer: {
-        cart: cartReducer
+        cart: cartReducer,
+        auth: authReducer,
     },
      preloadedState: {
     cart: {

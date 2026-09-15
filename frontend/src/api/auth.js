@@ -51,3 +51,26 @@ export async function loginUser(credentials) {
 
   return data;
 }
+
+export async function getCurrentUser(accessToken) {
+  const response = await fetch(`${AUTH_API_URL}/me`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    const error = new Error(
+      typeof data.detail === "string"
+        ? data.detail
+        : "Could not load your account."
+    );
+
+    error.status = response.status;
+    throw error;
+  }
+
+  return data;
+}
