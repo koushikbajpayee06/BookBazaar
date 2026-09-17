@@ -9,11 +9,12 @@ const Header = () => {
 
   const user = useSelector((store) => store.auth.user);
 
-  const handleLogout = () => {
-    dispatch(clearCredentials());
-    closeMenu();
-    navigate("/login", { replace: true });
-  };
+const handleLogout = () => {
+  sessionStorage.removeItem("bookbazaar_access_token");
+  dispatch(clearCredentials());
+  closeMenu();
+  navigate("/login", { replace: true });
+};
   const [isMenuOpen, setIsMenuOpen] =
     useState(false);
 

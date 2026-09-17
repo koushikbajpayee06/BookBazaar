@@ -41,6 +41,10 @@ const Login = () => {
       });
 
       const user = await getCurrentUser(tokenData.access_token);
+        sessionStorage.setItem(
+        "bookbazaar_access_token",
+        tokenData.access_token
+      );
 
       dispatch(
         setCredentials({
