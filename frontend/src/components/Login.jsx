@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 
 import { loginUser, getCurrentUser } from "../api/auth";
 import { setCredentials } from "../utils/authSlice";
@@ -8,6 +12,7 @@ import { setCredentials } from "../utils/authSlice";
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [form, setForm] = useState({
     email: "",
@@ -41,7 +46,8 @@ const Login = () => {
       });
 
       const user = await getCurrentUser(tokenData.access_token);
-        sessionStorage.setItem(
+
+      sessionStorage.setItem(
         "bookbazaar_access_token",
         tokenData.access_token
       );
@@ -74,6 +80,12 @@ const Login = () => {
         <p className="mt-2 text-gray-600">
           Welcome back to BookBazaar.
         </p>
+
+        {location.state?.message && (
+          <p role="status" className="mt-4 text-sm text-orange-700">
+            {location.state.message}
+          </p>
+        )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-5">
           {error && (

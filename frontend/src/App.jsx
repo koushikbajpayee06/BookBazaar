@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 
 import "./App.css";
 import Header from "./components/Header";
@@ -15,6 +15,7 @@ const TOKEN_KEY = "bookbazaar_access_token";
 
 const AppLayout = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [sessionStatus, setSessionStatus] = useState("checking");
   const [retryCount, setRetryCount] = useState(0);
@@ -65,6 +66,29 @@ const AppLayout = () => {
       cancelled = true;
     };
   }, [dispatch, retryCount]);
+
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      navigate("/login", {
+        replace: true,
+        state: {
+          message: "Your session has expired. Please log in again.",
+        },
+      });
+    };
+
+    window.addEventListener(
+      "bookbazaar:session-expired",
+      handleSessionExpired
+    );
+
+    return () => {
+      window.removeEventListener(
+        "bookbazaar:session-expired",
+        handleSessionExpired
+      );
+    };
+  }, [navigate]);
 
   const handleRetry = () => {
     setSessionStatus("checking");
